@@ -5,16 +5,16 @@ import math
 import copy
 
 cookies_old = {
-        'JSESSIONID': '720C50E4D258B5906243D3B63B0A07D1',
+        'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
     }
 
 cookies = {
-        'JSESSIONID': '11111111111111111111111111111111',
+        'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
     }
 
 jid = 11111111111111111111111111111111
 
-h = {
+H = {
         'Host': 'www.agrar-fischerei-zahlungen.de',
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -26,10 +26,10 @@ h = {
         'Upgrade-Insecure-Requests': '1',
     }
 
-rq_data0 = [
+RQ_DATA_0 = [
   ('jahr', 'jahr'),
   ('name', ''),
-  ('plz', '95615'),
+  ('plz', '91586'),
   ('ort', ''),
   ('suchtypBetrag', 'betrag_gesamt'),
   ('operator', 'eq'),
@@ -296,11 +296,10 @@ rq_data0 = [
   ('massnahmen.massnahmenEler[46].schluessel', '00069'),
   ('massnahmen.massnahmenEler[46].untergruppe', '2'),
   ('_massnahmen.massnahmenEler[46].gewaehlt', 'on'),
-  ('limit', '10')
 ]
 
 rq_data1 = [
-        ('jahr', '2016'),
+        ('jahr', 'jahr'),
         ('name', ''),
         ('ort', ''),
         ('plz', '91586'),
@@ -327,7 +326,7 @@ rq_data1 = [
 
 
 data_3 = [
-  ('jahr', '2016'),
+  ('jahr', 'jahr'),
   ('name', ''),
   ('ort', ''),
   ('plz', ''),
@@ -380,47 +379,115 @@ def extract_waste_of_money():
 
 
 def debug():
-    r = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=h, cookies=cookies, data=rq_data0)
+    r = handle_request(cookies, RQ_DATA_0)
     text = r.text
     print(text)
 
 
-def extract_by_id(pid):
-    data_3[0] = ('jahr', '2016')
-    data_3[23] = ('showBeg', '600b8c91-be50-4222-a4d7-a3f3d974baf4')
-    r = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=h, cookies=cookies, data=data_3)
-    text = r.text
+def save_grants_to_csv(grant_dict, jahr):
+    columns = ["pid", "name", "plz"]
+    pd = pandas.DataFrame.from_dict(grant_dict, orient='index')
+    pd.reset_index(drop=True, inplace=True)
+    # Now you have a csv with columns and index:
+    pd.to_csv(str(jahr) + ".csv")
+    return True
 
-    start = 0
-    final = text.find('</html>')
-    while True:
-        pos_start = text.find('</abbr>: ', start)
-        tmp = text.find("\n", pos_start)
-        if tmp > final:
-            break
-        p1 = pos_start + 9
-        p2 = tmp - 10
-        measure = text[p1:p2]
-        #print(measure[:55])
-        #name_list.append(entry)
-        start = tmp
+
+def extract_grants(jahrtype, jahr):
+    df = pandas.read_csv(str("91586_" + str(jahr) + ".csv"))
+    #print(df)
+    pd = df.loc[:, "pid"]
+    pid_list = pd.values.tolist()
+    result_dict = {}
+    for pid in pid_list:
+        grant = extract_by_id(pid, jahrtype)
+        result_dict[pid] = grant
+
+    save_grants_to_csv(result_dict, jahr)
+    #print(list(map(list, pd.values)))
+    # https://stackoverflow.com/questions/33157522/create-pandas-dataframe-from-dictionary-of-dictionaries
+
     return 0
 
 
-def save_to_csv(array_list):
+def extract_by_id(pid, jahrtype):
+    data_3[0] = ('jahr', jahrtype)
+    data_3[23] = ('showBeg', pid)
+    r = handle_request(cookies, data_3)
+    text = r.text
+    #print(text)
+    measure_list = []
+    grant = {"pid": pid}
+
+    start = 0
+    tmp = 0
+    result = 0
+    final = text.find('</body>', start)
+    sum_start = text.find('<span class="betrag" style="float: right;">', 0)
+    sum_end = text.find('euro', sum_start - 40)
+    raw_sum = text[sum_start + 43:sum_end - 2]
+    # print(raw_sum)
+    # print(type(raw_sum))
+    sum_euro = raw_sum[:-3]
+    sum_euro = int(sum_euro.replace('.', ''))
+    sum_cent = int(raw_sum[-2::])
+    sum_amount = int(sum_euro * 100 + sum_cent)
+    grant["Gesamtbetrag"] = sum_amount
+    #grant["Summe"] = int(0)
+    print(sum_amount)
+    while True:
+        pos_start = text.find('</abbr>: ', start)
+        tmp = text.find("\n", pos_start)
+        p1 = pos_start + 9
+        p2 = tmp - 10
+        measure = text[p1:p2]
+        value_start = text.find('<span class="betrag">', tmp)
+        value_end = text.find('euro', value_start)
+        if value_end == -1:
+            break
+        raw_value = text[value_start+21:value_end-2]
+        #print(raw_value)
+        euro = raw_value[:-3]
+        euro = int(euro.replace('.', ''))
+        cent = int(raw_value[-2::])
+        #print(euro, cent)
+        amount = int(euro*100 + cent)
+        #print(amount)
+        #print(measure)
+        grant[measure] = int(amount)
+        result += amount
+        #print(measure[:55])
+        #print(measure)
+        measure_list.append(measure)
+        start = tmp
+
+    #result /= 100
+
+
+    #print(result)
+    #grant["Summe"] = int(result)
+    print(grant)
+    return grant
+
+
+def save_ids_to_csv(array_list, jahr):
     columns = ["pid", "name", "plz"]
     pd = pandas.DataFrame(array_list, columns=columns)
-    pd.drop_duplicates("pid", inplace=True)
+    pd.drop_duplicates(["pid"], inplace=True)
     pd.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
-    pd.to_csv("mylist.csv")
+    pd.to_csv(str("91586_" + str(jahr) + ".csv"))
     return True, array_list
 
 
 def get_meta_data(response):
     count_start = response.find('<span>')
     raw_count = response[count_start + 22:count_start + 27]
-    count = int(raw_count.strip())
+    #print(raw_count)
+    try:
+        count = int(raw_count.strip())
+    except ValueError:
+        return 0, 0
     view_count_start = response.find('<input id="hCount" name="viewCount" type="hidden" value="', 0)
     view_count_end = response.find('/>', view_count_start)
     raw_v_count = response[view_count_start + 57:view_count_end - 1]
@@ -429,56 +496,61 @@ def get_meta_data(response):
     return view_count, count
 
 
-def test():
+def extract_ids(jahrtype, jahr):
     name_list = []
 
-    #for i in range(100000, 90000, -1):
+    for i in range(91586, 91585, -1):
     #for i in range(96000, 95000, -1):
-    for i in range(95615, 95614, -1):
+    #for i in range(95615, 95614, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
-        print(plz)
-        tmp_list = extract_from_plz(plz)
+        #print(plz)
+        tmp_list = extract_from_plz(plz, jahrtype)
         name_list.extend(tmp_list)
         #sleep(3)
         #print(tmp_list)
 
     #print(name_list)
-    err, _ = save_to_csv(name_list)
+    err, _ = save_ids_to_csv(name_list, jahr)
     return 0
 
 
-def extract_from_plz(plz):
-    rq_data0[2] = ('plz', str(plz))
+def extract_from_plz(plz, jahr):
+    RQ_DATA_0[2] = ('plz', str(plz))
     #cookies['JESSIONID'] = str(jid+int(plz))
     off = 0
     #name_list = []
     i = 0
-    r1 = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=h, cookies=cookies, data=rq_data0)
+    r1 = handle_request(cookies, RQ_DATA_0)
     text = r1.text
+    #print(text)
     view_count, count = get_meta_data(text)
 
-    rq_data1[0] = ('jahr', '2016')
+    if count == 0:
+        return []
+
+    print(plz)
+    rq_data1[0] = ('jahr', jahr)
     rq_data1[3] = ('plz', str(plz))
     rq_data1[12] = ('viewCount', view_count)
     rq_data1[13] = ('viewCountBeg', count)
     rq_data1[18] = ('count', view_count)
     rq_data1[19] = ('countBeg', count)
-    print(rq_data1)
-    r2 = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=h, cookies=cookies, data=rq_data1)
+    #print(rq_data1)
+    r2 = handle_request(cookies, rq_data1)
     rq_data2 = copy.deepcopy(rq_data1)
     #print(r1.text)
-    print(r2.text)
+    #print(r2.text)
     name_list = extract_columns(r2.text, plz)
     #rq_data2.append(('listNav', 'Vor'))
 
-    print(count)
+    #print(count)
 
-    while i < math.ceil(view_count/10):
-        rq_data2[22] = ('seite', str(i+1))
+    while i < math.ceil(view_count/3):
+        rq_data2[22] = ('seite', str(i))
 
-        print(i+1)
-        rq = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=h, cookies=cookies, data=rq_data2)
+        #print(i+1)
+        rq = handle_request(cookies, rq_data2)
         text = rq.text
         tmp_list = extract_columns(text, plz)
         #print(tmp_list)
@@ -502,7 +574,7 @@ def extract_columns(recipient_list, plz):
     name_list = []
     eof = recipient_list.find('</html>', start)
 
-    while start < eof:
+    while True:
         #if plz == "95615":
             # print(recipient_list)
         pos_start = recipient_list.find('<button', start)
@@ -528,10 +600,23 @@ def extract_column(recipient_entry, plz):
     name = raw_name.strip()
     if name == "Kleinempfänger":
         print(name)
+        print([pid, name, plz])
     #print(pid, name)
     return [pid, name, plz]
 
 
-test()
+def handle_request(c, data):
+    try:
+        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=c, data=data)
+    except requests.exceptions.ConnectionError:
+        print("Server to many connections error detected, sleeping!")
+        sleep(3)
+        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=c, data=data)
+    #print(request)
+    return request
+
+#test()
 #debug()
-#extract_by_id(0)
+#extract_by_id("0")
+extract_ids("vorjahr", 2015)
+#extract_grants("jahr", 2016)
