@@ -436,7 +436,7 @@ def get_meta_data(response):
 def extract_ids(jahrtype, jahr):
     name_list = []
 
-    for i in range(91586, 91585, -1):
+    for i in range(99999, 1, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
