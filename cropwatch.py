@@ -489,8 +489,9 @@ def adv_parser_by_pid(pid, yeartype):
     measure_list.append('Gesamt')
 
     name, location = metadata.split('–')
-    location = location[1:-3]
-    plz, place = location.split(' ')
+    location = location[1:-2]
+    print(location)
+    plz, place = location.split(' ', 1)
 
     grant["name"] = name[:-1]
     grant["plz"] = int(plz)
