@@ -437,7 +437,7 @@ def get_meta_data(response):
 def extract_ids(jahrtype, jahr):
     name_list = []
 
-    for i in range(99999, 1, -1):
+    for i in range(91586, 91585, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
@@ -458,9 +458,7 @@ def handle_request(cookie, data):
 
 def adv_parser_ids(response):
     tree = html.document_fromstring(response)
-    pid_list_xml = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
-    pid_list = list(map(lambda x: str(x), pid_list_xml))
-    del pid_list_xml
+    pid_list = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')))
     del tree
     gc.collect()
     return pid_list
