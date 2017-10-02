@@ -6,15 +6,15 @@ import copy
 from lxml import html
 
 
-cookies_old = {
+COOKIES_OLD = {
         'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
     }
 
-cookies = {
+COOKIES = {
         'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
     }
 
-jid = 11111111111111111111111111111111
+JID = 11111111111111111111111111111111
 
 H = {
         'Host': 'www.agrar-fischerei-zahlungen.de',
@@ -300,7 +300,7 @@ RQ_DATA_0 = [
   ('_massnahmen.massnahmenEler[46].gewaehlt', 'on')
 ]
 
-rq_data1 = [
+RQ_DATA_1 = [
         ('jahr', 'jahr'),
         ('name', ''),
         ('ort', ''),
@@ -327,7 +327,7 @@ rq_data1 = [
     ]
 
 
-data_3 = [
+RQ_DATA_2 = [
   ('jahr', 'jahr'),
   ('name', ''),
   ('ort', ''),
@@ -354,7 +354,7 @@ data_3 = [
   ('showBeg', '600b8c91-be50-4222-a4d7-a3f3d974baf4')
 ]
 
-data_change_to_50 = [
+RQ_DATA_3 = [
   ('jahr', 'jahr'),
   ('name', ''),
   ('ort', ''),
@@ -382,18 +382,18 @@ data_change_to_50 = [
 
 
 def save_grants_to_csv(grant_dict, jahr):
-    pd = pandas.DataFrame.from_dict(grant_dict, orient='index')
-    pd.reset_index(drop=True, inplace=True)
+    grants_df = pandas.DataFrame.from_dict(grant_dict, orient='index')
+    grants_df.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
-    pd.to_csv(str(jahr) + "_grants" + ".csv")
+    grants_df.to_csv(str(jahr) + "_grants" + ".csv")
     return True
 
 
 def extract_grants(jahrtype, jahr):
-    df = pandas.read_csv(str("91586_" + str(jahr) + ".csv"))
-    # print(df)
-    pd = df.loc[:, "pid"]
-    pid_list = pd.values.tolist()
+    dataframe = pandas.read_csv(str("91586_" + str(jahr) + ".csv"))
+    # print(dataframe)
+    dataframe_2 = dataframe.loc[:, "pid"]
+    pid_list = dataframe_2.values.tolist()
     result_dict = {}
 
     for pid in pid_list:
@@ -401,7 +401,7 @@ def extract_grants(jahrtype, jahr):
         result_dict[pid] = grant
 
     save_grants_to_csv(result_dict, jahr)
-    # print(list(map(list, pd.values)))
+    # print(list(map(list, dataframe_2.values)))
     # https://stackoverflow.com/questions/33157522/create-pandas-dataframe-from-dictionary-of-dictionaries
 
     return 0
@@ -409,12 +409,12 @@ def extract_grants(jahrtype, jahr):
 
 def save_ids_to_csv(array_list, jahr):
     columns = ["pid"]
-    pd = pandas.DataFrame(array_list, columns=columns)
-    pd.drop_duplicates(["pid"], inplace=True)
-    pd.reset_index(drop=True, inplace=True)
+    dataframe_3 = pandas.DataFrame(array_list, columns=columns)
+    dataframe_3.drop_duplicates(["pid"], inplace=True)
+    dataframe_3.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
-    pd.to_csv(str(str(jahr) + "_ids" + ".csv"))
-    return True, array_list
+    dataframe_3.to_csv(str(str(jahr) + "_ids" + ".csv"))
+    return array_list
 
 
 def get_meta_data(response):
@@ -441,7 +441,7 @@ def extract_ids(jahrtype, jahr):
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
         name_list.extend(tmp_list)
-    err, _ = save_ids_to_csv(name_list, jahr)
+    _ = save_ids_to_csv(name_list, jahr)
     return 0
 
 
@@ -470,12 +470,12 @@ def amount_to_cent(amount):
 
 
 def adv_parser_by_pid(pid, yeartype):
-    data_3[0] = ('jahr', yeartype)
-    data_3[23] = ('showBeg', pid)
+    RQ_DATA_2[0] = ('jahr', yeartype)
+    RQ_DATA_2[23] = ('showBeg', pid)
 
     grant = {"pid": pid, "Gesamt": ""}
 
-    r = handle_request(cookies, data_3)
+    r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(r.text)
     metadata = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]  # name + ...
     raw_measures = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')  # name of grant
@@ -493,7 +493,7 @@ def adv_parser_by_pid(pid, yeartype):
     grant["plz"] = int(plz)
     grant["place"] = place
 
-    amounts = list(map(lambda x: amount_to_cent(x), raw_amounts))
+    amounts = list(map(amount_to_cent, raw_amounts))
 
     for measure, amount in zip(measure_list, amounts):
         grant[measure] = amount
@@ -504,7 +504,7 @@ def adv_parser_by_pid(pid, yeartype):
 def adv_from_plz(plz, jahr):
     RQ_DATA_0[2] = ('plz', str(plz))
     i = 1
-    r1 = handle_request(cookies, RQ_DATA_0)
+    r1 = handle_request(COOKIES, RQ_DATA_0)
     text = r1.text
     view_count, count = get_meta_data(text)
     # print(view_count, count)
@@ -513,22 +513,22 @@ def adv_from_plz(plz, jahr):
         return []
 
     print(plz)
-    rq_data1[0] = ('jahr', jahr)
-    rq_data1[3] = ('plz', str(plz))
-    rq_data1[12] = ('viewCount', view_count)
-    rq_data1[13] = ('viewCountBeg', count)
-    rq_data1[18] = ('count', view_count)
-    rq_data1[19] = ('countBeg', count)
+    RQ_DATA_1[0] = ('jahr', jahr)
+    RQ_DATA_1[3] = ('plz', str(plz))
+    RQ_DATA_1[12] = ('viewCount', view_count)
+    RQ_DATA_1[13] = ('viewCountBeg', count)
+    RQ_DATA_1[18] = ('count', view_count)
+    RQ_DATA_1[19] = ('countBeg', count)
 
-    rq_data2 = copy.deepcopy(rq_data1)
+    rq_data2 = copy.deepcopy(RQ_DATA_1)
 
-    rq = handle_request(cookies, rq_data2)
+    rq = handle_request(COOKIES, rq_data2)
     name_list = adv_parser_ids(rq.text)
 
     while i < math.ceil(view_count/50):
         rq_data2[22] = ('seite', str(i))
 
-        rq = handle_request(cookies, rq_data2)
+        rq = handle_request(COOKIES, rq_data2)
         text = rq.text
         tmp_list = adv_parser_ids(text)
 
