@@ -3,6 +3,8 @@ import pandas
 from time import sleep
 import math
 import copy
+from lxml import html
+
 
 cookies_old = {
         'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
@@ -295,7 +297,7 @@ RQ_DATA_0 = [
   ('massnahmen.massnahmenEler[46].kurztext', 'Technische Hilfe'),
   ('massnahmen.massnahmenEler[46].schluessel', '00069'),
   ('massnahmen.massnahmenEler[46].untergruppe', '2'),
-  ('_massnahmen.massnahmenEler[46].gewaehlt', 'on'),
+  ('_massnahmen.massnahmenEler[46].gewaehlt', 'on')
 ]
 
 rq_data1 = [
@@ -311,16 +313,16 @@ rq_data1 = [
         ('viewOffset', '0'),
         ('viewOrderdir', 'asc'),
         ('viewOrderby', 'zahlungsempfaenger'),
-        ('viewCount', '349'),
-        ('viewCountBeg', '63'),
+        ('viewCount', ''),
+        ('viewCountBeg', ''),
         ('viewLimit', '50'),
         ('offset', '0'),
         ('dir', 'asc'),
         ('order', 'zahlungsempfaenger'),
-        ('count', '349'),
-        ('countBeg', '63'),
-        ('prevLimit', '10'),
-        ('limit', '10'),
+        ('count', ''),
+        ('countBeg', ''),
+        ('prevLimit', '50'),
+        ('limit', '50'),
         ('seite', '1')
     ]
 
@@ -344,12 +346,38 @@ data_3 = [
   ('offset', '0'),
   ('dir', 'asc'),
   ('order', 'zahlungsempfaenger'),
-  ('count', '349'),
-  ('countBeg', '1'),
-  ('prevLimit', '50'),
-  ('limit', '50'),
+  ('count', ''),
+  ('countBeg', ''),
+  ('prevLimit', '10'),
+  ('limit', '10'),
   ('seite', '1'),
   ('showBeg', '600b8c91-be50-4222-a4d7-a3f3d974baf4')
+]
+
+data_change_to_50 = [
+  ('jahr', 'jahr'),
+  ('name', ''),
+  ('ort', ''),
+  ('plz', '91586'),
+  ('suchtypBetrag', 'betrag_gesamt'),
+  ('operator', 'eq'),
+  ('betrag', ''),
+  ('suchtypEgfl', 'egfl_alle'),
+  ('suchtypEler', 'eler_alle'),
+  ('viewOffset', '0'),
+  ('viewOrderdir', 'asc'),
+  ('viewOrderby', 'zahlungsempfaenger'),
+  ('viewCount', ''),
+  ('viewCountBeg', ''),
+  ('viewLimit', '10'),
+  ('offset', '0'),
+  ('dir', 'asc'),
+  ('order', 'zahlungsempfaenger'),
+  ('count', ''),
+  ('countBeg', ''),
+  ('prevLimit', '10'),
+  ('limit', '50'),
+  ('seite', '1'),
 ]
 
 
@@ -385,11 +413,10 @@ def debug():
 
 
 def save_grants_to_csv(grant_dict, jahr):
-    columns = ["pid", "name", "plz"]
     pd = pandas.DataFrame.from_dict(grant_dict, orient='index')
     pd.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
-    pd.to_csv(str(jahr) + ".csv")
+    pd.to_csv(str(jahr) + "_grants" + ".csv")
     return True
 
 
@@ -399,8 +426,9 @@ def extract_grants(jahrtype, jahr):
     pd = df.loc[:, "pid"]
     pid_list = pd.values.tolist()
     result_dict = {}
+
     for pid in pid_list:
-        grant = extract_by_id(pid, jahrtype)
+        grant = adv_parser_by_pid(pid, jahrtype)
         result_dict[pid] = grant
 
     save_grants_to_csv(result_dict, jahr)
@@ -410,73 +438,13 @@ def extract_grants(jahrtype, jahr):
     return 0
 
 
-def extract_by_id(pid, jahrtype):
-    data_3[0] = ('jahr', jahrtype)
-    data_3[23] = ('showBeg', pid)
-    r = handle_request(cookies, data_3)
-    text = r.text
-    #print(text)
-    measure_list = []
-    grant = {"pid": pid}
-
-    start = 0
-    tmp = 0
-    result = 0
-    final = text.find('</body>', start)
-    sum_start = text.find('<span class="betrag" style="float: right;">', 0)
-    sum_end = text.find('euro', sum_start - 40)
-    raw_sum = text[sum_start + 43:sum_end - 2]
-    # print(raw_sum)
-    # print(type(raw_sum))
-    sum_euro = raw_sum[:-3]
-    sum_euro = int(sum_euro.replace('.', ''))
-    sum_cent = int(raw_sum[-2::])
-    sum_amount = int(sum_euro * 100 + sum_cent)
-    grant["Gesamtbetrag"] = sum_amount
-    #grant["Summe"] = int(0)
-    print(sum_amount)
-    while True:
-        pos_start = text.find('</abbr>: ', start)
-        tmp = text.find("\n", pos_start)
-        p1 = pos_start + 9
-        p2 = tmp - 10
-        measure = text[p1:p2]
-        value_start = text.find('<span class="betrag">', tmp)
-        value_end = text.find('euro', value_start)
-        if value_end == -1:
-            break
-        raw_value = text[value_start+21:value_end-2]
-        #print(raw_value)
-        euro = raw_value[:-3]
-        euro = int(euro.replace('.', ''))
-        cent = int(raw_value[-2::])
-        #print(euro, cent)
-        amount = int(euro*100 + cent)
-        #print(amount)
-        #print(measure)
-        grant[measure] = int(amount)
-        result += amount
-        #print(measure[:55])
-        #print(measure)
-        measure_list.append(measure)
-        start = tmp
-
-    #result /= 100
-
-
-    #print(result)
-    #grant["Summe"] = int(result)
-    print(grant)
-    return grant
-
-
 def save_ids_to_csv(array_list, jahr):
-    columns = ["pid", "name", "plz"]
+    columns = ["pid"]
     pd = pandas.DataFrame(array_list, columns=columns)
     pd.drop_duplicates(["pid"], inplace=True)
     pd.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
-    pd.to_csv(str("91586_" + str(jahr) + ".csv"))
+    pd.to_csv(str(str(jahr) + "_ids" + ".csv"))
     return True, array_list
 
 
@@ -504,8 +472,8 @@ def extract_ids(jahrtype, jahr):
     #for i in range(95615, 95614, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
-        #print(plz)
-        tmp_list = extract_from_plz(plz, jahrtype)
+        print(plz)
+        tmp_list = adv_from_plz(plz, jahrtype)
         name_list.extend(tmp_list)
         #sleep(3)
         #print(tmp_list)
@@ -513,96 +481,6 @@ def extract_ids(jahrtype, jahr):
     #print(name_list)
     err, _ = save_ids_to_csv(name_list, jahr)
     return 0
-
-
-def extract_from_plz(plz, jahr):
-    RQ_DATA_0[2] = ('plz', str(plz))
-    #cookies['JESSIONID'] = str(jid+int(plz))
-    off = 0
-    #name_list = []
-    i = 0
-    r1 = handle_request(cookies, RQ_DATA_0)
-    text = r1.text
-    #print(text)
-    view_count, count = get_meta_data(text)
-
-    if count == 0:
-        return []
-
-    print(plz)
-    rq_data1[0] = ('jahr', jahr)
-    rq_data1[3] = ('plz', str(plz))
-    rq_data1[12] = ('viewCount', view_count)
-    rq_data1[13] = ('viewCountBeg', count)
-    rq_data1[18] = ('count', view_count)
-    rq_data1[19] = ('countBeg', count)
-    #print(rq_data1)
-    r2 = handle_request(cookies, rq_data1)
-    rq_data2 = copy.deepcopy(rq_data1)
-    #print(r1.text)
-    #print(r2.text)
-    name_list = extract_columns(r2.text, plz)
-    #rq_data2.append(('listNav', 'Vor'))
-
-    #print(count)
-
-    while i < math.ceil(view_count/3):
-        rq_data2[22] = ('seite', str(i))
-
-        #print(i+1)
-        rq = handle_request(cookies, rq_data2)
-        text = rq.text
-        tmp_list = extract_columns(text, plz)
-        #print(tmp_list)
-        if not tmp_list:
-            break
-        name_list.extend(tmp_list)
-        #print(name_list)
-        i += 1
-        #print(i)
-        #off += 10
-        #print(off)
-        #data_2[9] = ('viewOffset', str(off))
-        #data_2[15] = ('offset', str(off))
-        #data_2[22] = ('seite', str(i))
-    #print(name_list)
-    return name_list
-
-
-def extract_columns(recipient_list, plz):
-    start = 0
-    name_list = []
-    eof = recipient_list.find('</html>', start)
-
-    while True:
-        #if plz == "95615":
-            # print(recipient_list)
-        pos_start = recipient_list.find('<button', start)
-        if pos_start == -1:
-            break
-        tmp = recipient_list.find("\n", pos_start)
-        pos_end = recipient_list.find("\n", tmp + 1)
-        recipient_entry = recipient_list[pos_start:pos_end]
-        entry = extract_column(recipient_entry, plz)
-        #print(entry)
-        name_list.append(entry)
-        start += pos_end
-    #print(name_list)
-    return name_list
-
-
-def extract_column(recipient_entry, plz):
-    #print(recipient_entry)
-    raw_pid, raw_name = recipient_entry.splitlines()
-    pos_pid = raw_pid.find('value="')
-    #print(pos_pid)
-    pid = raw_pid[pos_pid+7:pos_pid+7+36]
-    name = raw_name.strip()
-    if name == "Kleinempfänger":
-        print(name)
-        print([pid, name, plz])
-    #print(pid, name)
-    return [pid, name, plz]
 
 
 def handle_request(c, data):
@@ -615,8 +493,164 @@ def handle_request(c, data):
     #print(request)
     return request
 
+
+def adv_parser_ids(response, plz):
+    tree = html.document_fromstring(response)
+    pid_list = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
+    return pid_list
+
+
+def amount_to_cent(amount):
+    amount = amount[:-2]
+    amounts = euro = amount[:-3]
+    euro = int(euro.replace('.', ''))
+    cent = int(amount[-2::])
+    return euro*100 + cent
+
+
+def adv_parser_by_pid(pid, yeartype):
+    data_3[0] = ('jahr', yeartype)
+    data_3[23] = ('showBeg', pid)
+
+    grant = {"pid": pid, "Gesamt": ""}
+
+    r = handle_request(cookies, data_3)
+    tree = html.document_fromstring(r.text)
+    metadata = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]  # name + ...
+    raw_measures = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')  # name of grant
+    raw_amounts = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')  # amount of money
+    raw_amounts = raw_amounts[:-2] # drop unrelevant rows
+
+    #print(raw_amounts)
+
+    measure_list = list(map(lambda x: x[2:], raw_measures))
+    measure_list.append('Gesamt')
+    #print(measure_list)
+    #raw_sum = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[8]/span[1]')
+
+    #print(metadata)
+    #print(measure_list)
+    #print(raw_amounts)
+
+    name, location = metadata.split('–')
+    location = location[1:-3]
+    plz, place = location.split(' ')
+    #print(location)
+
+    grant["name"] = name[:-1]
+    grant["plz"] = int(plz)
+    grant["place"] = place
+
+    #print(measure_list)
+    #print(raw_amounts)
+
+    amounts = list(map(lambda x: amount_to_cent(x), raw_amounts))
+    #print(amounts)
+
+    for _, measure, amount in zip(amounts, measure_list, amounts):
+        grant[measure] = amount
+
+    # print(text)
+    measure_list = []
+
+    return grant
+
+
+
+
+
+
+def test_parser():
+    plz = "91586"
+    jahr = "jahr"
+    RQ_DATA_0[2] = ('plz', str(plz))
+    # cookies['JESSIONID'] = str(jid+int(plz))
+    # name_list = []
+    i = 0
+    r1 = handle_request(cookies, RQ_DATA_0)
+    text = r1.text
+    # print(text)
+    view_count, count = get_meta_data(text)
+
+    #rt = handle_request(cookies, data_change_to_50)
+
+    if count == 0:
+        return []
+
+    print(plz)
+    rq_data1[0] = ('jahr', jahr)
+    rq_data1[3] = ('plz', str(plz))
+    rq_data1[12] = ('viewCount', view_count)
+    rq_data1[13] = ('viewCountBeg', count)
+    rq_data1[18] = ('count', view_count)
+    rq_data1[19] = ('countBeg', count)
+    # print(rq_data1)
+    #r2 = handle_request(cookies, rq_data1)
+    rq_data2 = copy.deepcopy(rq_data1)
+    # print(r1.text)
+    # print(r2.text)
+    #name_list = extract_columns(r2.text, plz)
+    # rq_data2.append(('listNav', 'Vor'))
+
+    # print(count)
+
+    rq = handle_request(cookies, rq_data2)
+    text = rq.text
+    tmp_list = adv_parser_ids(text, plz)
+    print(tmp_list)
+
+
+def adv_from_plz(plz, jahr):
+    RQ_DATA_0[2] = ('plz', str(plz))
+    i = 1
+    r1 = handle_request(cookies, RQ_DATA_0)
+    text = r1.text
+    view_count, count = get_meta_data(text)
+    # print(view_count, count)
+
+    if count == 0:
+        return []
+
+    # print(plz)
+    rq_data1[0] = ('jahr', jahr)
+    rq_data1[3] = ('plz', str(plz))
+    rq_data1[12] = ('viewCount', view_count)
+    rq_data1[13] = ('viewCountBeg', count)
+    rq_data1[18] = ('count', view_count)
+    rq_data1[19] = ('countBeg', count)
+
+    rq_data2 = copy.deepcopy(rq_data1)
+
+    rq = handle_request(cookies, rq_data2)
+    name_list = adv_parser_ids(rq.text, plz)
+    #i += 1
+
+    while i < math.ceil(view_count/50):
+        #rq_data1[9] = ('viewOffset', str(i*50))
+        #rq_data1[15] = ('offset', str(i*50))
+        rq_data2[22] = ('seite', str(i))
+
+        #print(i+1)
+        rq = handle_request(cookies, rq_data2)
+        text = rq.text
+        tmp_list = adv_parser_ids(text, plz)
+        #print(tmp_list)
+        if not tmp_list:
+            break
+        name_list.extend(tmp_list)
+        i += 1
+
+    return name_list
+
+
+
+
 #test()
 #debug()
 #extract_by_id("0")
 extract_ids("vorjahr", 2015)
-#extract_grants("jahr", 2016)
+extract_grants("vorjahr", 2015)
+extract_ids("jahr", 2016)
+extract_grants("jahr", 2016)
+
+#test_parser()
