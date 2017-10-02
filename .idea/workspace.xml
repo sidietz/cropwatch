@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7fdd9a4d-8c03-4ab9-8121-44c6f2aaf0a3" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cropwatch.py" afterPath="$PROJECT_DIR$/cropwatch.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +16,8 @@
       <file leaf-file-name="cropwatch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cropwatch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="447">
-              <caret line="501" column="0" lean-forward="true" selection-start-line="501" selection-start-column="0" selection-end-line="501" selection-end-column="0" />
+            <state relative-caret-position="158">
+              <caret line="461" column="12" lean-forward="true" selection-start-line="461" selection-start-column="12" selection-end-line="461" selection-end-column="12" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -307,8 +306,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cropwatch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="501" column="0" lean-forward="true" selection-start-line="501" selection-start-column="0" selection-end-line="501" selection-end-column="0" />
+        <state relative-caret-position="158">
+          <caret line="461" column="12" lean-forward="true" selection-start-line="461" selection-start-column="12" selection-end-line="461" selection-end-column="12" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

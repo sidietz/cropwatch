@@ -458,9 +458,7 @@ def handle_request(cookie, data):
 
 def adv_parser_ids(response):
     tree = html.document_fromstring(response)
-    pid_list_xml = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
-    pid_list = list(map(lambda x: str(x), pid_list_xml))
-    del pid_list_xml
+    pid_list = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')))
     del tree
     gc.collect()
     return pid_list
