@@ -5,7 +5,6 @@ max-line-length: 160
 pep8:
   disable:
     - E501   # line too long
-    - WO141  # allow map
-    - 
+    - W0141  # allow map
 python-targets:
   - 3
