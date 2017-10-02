@@ -437,7 +437,7 @@ def get_meta_data(response):
 def extract_ids(jahrtype, jahr):
     name_list = []
 
-    for i in range(99999, 1, -1):
+    for i in range(91586, 91585, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
@@ -480,7 +480,7 @@ def adv_parser_by_pid(pid, yeartype):
 
     # r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
-    metadata = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]))  # name + ...
+    metadata = str(tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0])  # name + ...
     raw_measures = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
     raw_amounts = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
