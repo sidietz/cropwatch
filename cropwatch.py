@@ -381,37 +381,6 @@ data_change_to_50 = [
 ]
 
 
-def request_1(): # search for PLZ
-    return -1
-
-
-def request_2(): # update list to 50
-    return -1
-
-
-def request_3(): # navigate threw results to extract ids
-    return -1
-
-
-def request_4(): # show result of one bauer
-    return -1
-
-
-def cropwatch():
-    return -1
-
-
-def extract_waste_of_money():
-    # 23: showBeg
-    return 0
-
-
-def debug():
-    r = handle_request(cookies, RQ_DATA_0)
-    text = r.text
-    print(text)
-
-
 def save_grants_to_csv(grant_dict, jahr):
     pd = pandas.DataFrame.from_dict(grant_dict, orient='index')
     pd.reset_index(drop=True, inplace=True)
@@ -422,7 +391,7 @@ def save_grants_to_csv(grant_dict, jahr):
 
 def extract_grants(jahrtype, jahr):
     df = pandas.read_csv(str("91586_" + str(jahr) + ".csv"))
-    #print(df)
+    # print(df)
     pd = df.loc[:, "pid"]
     pid_list = pd.values.tolist()
     result_dict = {}
@@ -432,7 +401,7 @@ def extract_grants(jahrtype, jahr):
         result_dict[pid] = grant
 
     save_grants_to_csv(result_dict, jahr)
-    #print(list(map(list, pd.values)))
+    # print(list(map(list, pd.values)))
     # https://stackoverflow.com/questions/33157522/create-pandas-dataframe-from-dictionary-of-dictionaries
 
     return 0
@@ -451,7 +420,7 @@ def save_ids_to_csv(array_list, jahr):
 def get_meta_data(response):
     count_start = response.find('<span>')
     raw_count = response[count_start + 22:count_start + 27]
-    #print(raw_count)
+    # print(raw_count)
     try:
         count = int(raw_count.strip())
     except ValueError:
@@ -468,17 +437,10 @@ def extract_ids(jahrtype, jahr):
     name_list = []
 
     for i in range(99999, 1, -1):
-    #for i in range(96000, 95000, -1):
-    #for i in range(95615, 95614, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
-        print(plz)
         tmp_list = adv_from_plz(plz, jahrtype)
         name_list.extend(tmp_list)
-        #sleep(3)
-        #print(tmp_list)
-
-    #print(name_list)
     err, _ = save_ids_to_csv(name_list, jahr)
     return 0
 
@@ -490,11 +452,10 @@ def handle_request(c, data):
         print("Server to many connections error detected, sleeping!")
         sleep(3)
         request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=c, data=data)
-    #print(request)
     return request
 
 
-def adv_parser_ids(response, plz):
+def adv_parser_ids(response):
     tree = html.document_fromstring(response)
     pid_list = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
     return pid_list
@@ -502,7 +463,7 @@ def adv_parser_ids(response, plz):
 
 def amount_to_cent(amount):
     amount = amount[:-2]
-    amounts = euro = amount[:-3]
+    euro = amount[:-3]
     euro = int(euro.replace('.', ''))
     cent = int(amount[-2::])
     return euro*100 + cent
@@ -519,85 +480,25 @@ def adv_parser_by_pid(pid, yeartype):
     metadata = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]  # name + ...
     raw_measures = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')  # name of grant
     raw_amounts = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')  # amount of money
-    raw_amounts = raw_amounts[:-2] # drop unrelevant rows
-
-    #print(raw_amounts)
+    raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
 
     measure_list = list(map(lambda x: x[2:], raw_measures))
     measure_list.append('Gesamt')
-    #print(measure_list)
-    #raw_sum = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[8]/span[1]')
-
-    #print(metadata)
-    #print(measure_list)
-    #print(raw_amounts)
 
     name, location = metadata.split('–')
     location = location[1:-3]
     plz, place = location.split(' ')
-    #print(location)
 
     grant["name"] = name[:-1]
     grant["plz"] = int(plz)
     grant["place"] = place
 
-    #print(measure_list)
-    #print(raw_amounts)
-
     amounts = list(map(lambda x: amount_to_cent(x), raw_amounts))
-    #print(amounts)
 
-    for _, measure, amount in zip(amounts, measure_list, amounts):
+    for measure, amount in zip(measure_list, amounts):
         grant[measure] = amount
 
-    # print(text)
-    measure_list = []
-
     return grant
-
-
-
-
-
-
-def test_parser():
-    plz = "91586"
-    jahr = "jahr"
-    RQ_DATA_0[2] = ('plz', str(plz))
-    # cookies['JESSIONID'] = str(jid+int(plz))
-    # name_list = []
-    i = 0
-    r1 = handle_request(cookies, RQ_DATA_0)
-    text = r1.text
-    # print(text)
-    view_count, count = get_meta_data(text)
-
-    #rt = handle_request(cookies, data_change_to_50)
-
-    if count == 0:
-        return []
-
-    print(plz)
-    rq_data1[0] = ('jahr', jahr)
-    rq_data1[3] = ('plz', str(plz))
-    rq_data1[12] = ('viewCount', view_count)
-    rq_data1[13] = ('viewCountBeg', count)
-    rq_data1[18] = ('count', view_count)
-    rq_data1[19] = ('countBeg', count)
-    # print(rq_data1)
-    #r2 = handle_request(cookies, rq_data1)
-    rq_data2 = copy.deepcopy(rq_data1)
-    # print(r1.text)
-    # print(r2.text)
-    #name_list = extract_columns(r2.text, plz)
-    # rq_data2.append(('listNav', 'Vor'))
-
-    # print(count)
-
-    rq = handle_request(cookies, rq_data2)
-    text = rq.text
-    tmp_list = adv_parser_ids(text, plz)
-    print(tmp_list)
 
 
 def adv_from_plz(plz, jahr):
@@ -611,7 +512,7 @@ def adv_from_plz(plz, jahr):
     if count == 0:
         return []
 
-    # print(plz)
+    print(plz)
     rq_data1[0] = ('jahr', jahr)
     rq_data1[3] = ('plz', str(plz))
     rq_data1[12] = ('viewCount', view_count)
@@ -622,19 +523,15 @@ def adv_from_plz(plz, jahr):
     rq_data2 = copy.deepcopy(rq_data1)
 
     rq = handle_request(cookies, rq_data2)
-    name_list = adv_parser_ids(rq.text, plz)
-    #i += 1
+    name_list = adv_parser_ids(rq.text)
 
     while i < math.ceil(view_count/50):
-        #rq_data1[9] = ('viewOffset', str(i*50))
-        #rq_data1[15] = ('offset', str(i*50))
         rq_data2[22] = ('seite', str(i))
 
-        #print(i+1)
         rq = handle_request(cookies, rq_data2)
         text = rq.text
-        tmp_list = adv_parser_ids(text, plz)
-        #print(tmp_list)
+        tmp_list = adv_parser_ids(text)
+
         if not tmp_list:
             break
         name_list.extend(tmp_list)
@@ -643,14 +540,9 @@ def adv_from_plz(plz, jahr):
     return name_list
 
 
+# extract_by_id("0")
 
-
-#test()
-#debug()
-#extract_by_id("0")
 extract_ids("vorjahr", 2015)
 extract_grants("vorjahr", 2015)
 extract_ids("jahr", 2016)
 extract_grants("jahr", 2016)
-
-#test_parser()

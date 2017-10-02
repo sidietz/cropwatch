@@ -16,8 +16,8 @@
       <file leaf-file-name="cropwatch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cropwatch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="107">
-              <caret line="470" column="7" lean-forward="false" selection-start-line="470" selection-start-column="7" selection-end-line="470" selection-end-column="7" />
+            <state relative-caret-position="385">
+              <caret line="424" column="38" lean-forward="true" selection-start-line="424" selection-start-column="38" selection-end-line="424" selection-end-column="38" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -50,6 +50,10 @@
       <find>rq_data1</find>
       <find>to_c</find>
       <find>print</find>
+      <find>print(</find>
+      <find>print(plz</find>
+      <find>adv_par</find>
+      <find>adv_parser_ids</find>
     </findStrings>
     <replaceStrings>
       <replace>response</replace>
@@ -286,8 +290,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cropwatch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="107">
-          <caret line="470" column="7" lean-forward="false" selection-start-line="470" selection-start-column="7" selection-end-line="470" selection-end-column="7" />
+        <state relative-caret-position="385">
+          <caret line="424" column="38" lean-forward="true" selection-start-line="424" selection-start-column="38" selection-end-line="424" selection-end-column="38" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
