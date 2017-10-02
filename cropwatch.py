@@ -458,7 +458,9 @@ def handle_request(cookie, data):
 
 def adv_parser_ids(response):
     tree = html.document_fromstring(response)
-    pid_list = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
+    pid_list_xml = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
+    pid_list = list(map(lambda x: str(x), pid_list_xml))
+    del pid_list_xml
     del tree
     gc.collect()
     return pid_list
@@ -480,12 +482,10 @@ def adv_parser_by_pid(pid, yeartype):
 
     # r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
-    metadata = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]  # name + ...
-    raw_measures = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')  # name of grant
-    raw_amounts = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')  # amount of money
+    metadata = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]))  # name + ...
+    raw_measures = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
+    raw_amounts = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
-
-
 
     measure_list = list(map(lambda x: x[2:], raw_measures))
     measure_list.append('Gesamt')
