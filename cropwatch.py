@@ -482,7 +482,7 @@ def adv_parser_by_pid(pid, yeartype):
 
     # r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
-    metadata = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]))  # name + ...
+    metadata = str(tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0])  # name + ...
     raw_measures = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
     raw_amounts = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
@@ -553,7 +553,7 @@ def adv_from_plz(plz, jahr):
 
 # extract_by_id("0")
 
-extract_ids("vorjahr", 2015)
+#extract_ids("vorjahr", 2015)
 extract_grants("vorjahr", 2015)
 extract_ids("jahr", 2016)
 extract_grants("jahr", 2016)
