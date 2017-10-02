@@ -1,9 +1,11 @@
-doc-warnings: true
 test-warnings: true
 strictness: veryhigh
+doc-warnings: no
 max-line-length: 160
 pep8:
   disable:
-    - E501  # line too long
+    - E501   # line too long
+    - W0141  # allow map
+    - 
 python-targets:
   - 3

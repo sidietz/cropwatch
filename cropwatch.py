@@ -445,13 +445,13 @@ def extract_ids(jahrtype, jahr):
     return 0
 
 
-def handle_request(c, data):
+def handle_request(cookie, data):
     try:
-        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=c, data=data)
+        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
     except requests.exceptions.ConnectionError:
         print("Server to many connections error detected, sleeping!")
         sleep(3)
-        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=c, data=data)
+        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
     return request
 
 
@@ -475,8 +475,8 @@ def adv_parser_by_pid(pid, yeartype):
 
     grant = {"pid": pid, "Gesamt": ""}
 
-    r = handle_request(COOKIES, RQ_DATA_2)
-    tree = html.document_fromstring(r.text)
+    # r = handle_request(COOKIES, RQ_DATA_2)
+    tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
     metadata = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0]  # name + ...
     raw_measures = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')  # name of grant
     raw_amounts = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')  # amount of money
@@ -504,8 +504,8 @@ def adv_parser_by_pid(pid, yeartype):
 def adv_from_plz(plz, jahr):
     RQ_DATA_0[2] = ('plz', str(plz))
     i = 1
-    r1 = handle_request(COOKIES, RQ_DATA_0)
-    text = r1.text
+    request_0 = handle_request(COOKIES, RQ_DATA_0)
+    text = request_0.text
     view_count, count = get_meta_data(text)
     # print(view_count, count)
 
@@ -522,14 +522,14 @@ def adv_from_plz(plz, jahr):
 
     rq_data2 = copy.deepcopy(RQ_DATA_1)
 
-    rq = handle_request(COOKIES, rq_data2)
-    name_list = adv_parser_ids(rq.text)
+    request_1 = handle_request(COOKIES, rq_data2)
+    name_list = adv_parser_ids(request_1.text)
 
     while i < math.ceil(view_count/50):
         rq_data2[22] = ('seite', str(i))
 
-        rq = handle_request(COOKIES, rq_data2)
-        text = rq.text
+        request_1 = handle_request(COOKIES, rq_data2)
+        text = request_1.text
         tmp_list = adv_parser_ids(text)
 
         if not tmp_list:
