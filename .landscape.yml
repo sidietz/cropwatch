@@ -2,6 +2,7 @@ doc-warnings: true
 test-warnings: true
 strictness: veryhigh
 pep8:
-  full: true
+  disable:
+    - E501  # line too long
 python-targets:
   - 3
