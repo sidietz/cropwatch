@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7fdd9a4d-8c03-4ab9-8121-44c6f2aaf0a3" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/2015.csv" afterPath="$PROJECT_DIR$/2015.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/91586_2015.csv" afterPath="$PROJECT_DIR$/91586_2015.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cropwatch.py" afterPath="$PROJECT_DIR$/cropwatch.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,8 +16,8 @@
       <file leaf-file-name="cropwatch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cropwatch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1739">
-              <caret line="608" column="6" lean-forward="false" selection-start-line="608" selection-start-column="6" selection-end-line="608" selection-end-column="6" />
+            <state relative-caret-position="107">
+              <caret line="470" column="7" lean-forward="false" selection-start-line="470" selection-start-column="7" selection-end-line="470" selection-end-column="7" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -288,8 +286,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cropwatch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1739">
-          <caret line="608" column="6" lean-forward="false" selection-start-line="608" selection-start-column="6" selection-end-line="608" selection-end-column="6" />
+        <state relative-caret-position="107">
+          <caret line="470" column="7" lean-forward="false" selection-start-line="470" selection-start-column="7" selection-end-line="470" selection-end-column="7" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
