@@ -390,7 +390,7 @@ def save_grants_to_csv(grant_dict, jahr):
 
 
 def extract_grants(jahrtype, jahr):
-    dataframe = pandas.read_csv(str("91586_" + str(jahr) + ".csv"))
+    dataframe = pandas.read_csv(str(str(jahr) + "_ids" + ".csv"))
     # print(dataframe)
     dataframe_2 = dataframe.loc[:, "pid"]
     pid_list = dataframe_2.values.tolist()
@@ -436,7 +436,7 @@ def get_meta_data(response):
 def extract_ids(jahrtype, jahr):
     name_list = []
 
-    for i in range(99999, 1, -1):
+    for i in range(91586, 91585, -1):
         factor = 5-len(str(i))
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
