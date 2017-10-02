@@ -4,6 +4,7 @@ from time import sleep
 import math
 import copy
 from lxml import html
+import gc
 
 
 COOKIES_OLD = {
@@ -458,6 +459,8 @@ def handle_request(cookie, data):
 def adv_parser_ids(response):
     tree = html.document_fromstring(response)
     pid_list = tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')
+    del tree
+    gc.collect()
     return pid_list
 
 
@@ -482,6 +485,8 @@ def adv_parser_by_pid(pid, yeartype):
     raw_amounts = tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
 
+
+
     measure_list = list(map(lambda x: x[2:], raw_measures))
     measure_list.append('Gesamt')
 
@@ -497,6 +502,12 @@ def adv_parser_by_pid(pid, yeartype):
 
     for measure, amount in zip(measure_list, amounts):
         grant[measure] = amount
+
+    del tree
+    del metadata
+    del raw_measures
+    del raw_amounts
+    gc.collect()
 
     return grant
 
