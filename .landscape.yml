@@ -1,6 +1,7 @@
 doc-warnings: true
 test-warnings: true
 strictness: veryhigh
+max-line-length: 160
 pep8:
   disable:
     - E501  # line too long

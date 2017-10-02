@@ -414,7 +414,7 @@ def save_ids_to_csv(array_list, jahr):
     dataframe_3.reset_index(drop=True, inplace=True)
     # Now you have a csv with columns and index:
     dataframe_3.to_csv(str(str(jahr) + "_ids" + ".csv"))
-    return array_list
+    return True
 
 
 def get_meta_data(response):
@@ -441,7 +441,7 @@ def extract_ids(jahrtype, jahr):
         plz = "0"*factor + str(i)
         tmp_list = adv_from_plz(plz, jahrtype)
         name_list.extend(tmp_list)
-    _ = save_ids_to_csv(name_list, jahr)
+    save_ids_to_csv(name_list, jahr)
     return 0
 
 
