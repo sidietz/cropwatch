@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7fdd9a4d-8c03-4ab9-8121-44c6f2aaf0a3" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cropwatch.py" afterPath="$PROJECT_DIR$/cropwatch.py" />
-    </list>
+    <list default="true" id="7fdd9a4d-8c03-4ab9-8121-44c6f2aaf0a3" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +72,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="979" />
     <option name="y" value="278" />
     <option name="width" value="1242" />
@@ -161,7 +158,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="979" y="278" width="1242" height="689" extended-state="0" />
+    <frame x="979" y="278" width="1242" height="689" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20401338" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
