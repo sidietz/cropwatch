@@ -391,6 +391,7 @@ def save_grants_to_csv(grant_dict, jahr):
 
 
 def extract_grants(jahrtype, jahr):
+    print("start extraction of data")
     dataframe = pandas.read_csv(str(str(jahr) + "_ids" + ".csv"))
     # print(dataframe)
     dataframe_2 = dataframe.loc[:, "pid"]
@@ -490,7 +491,7 @@ def adv_parser_by_pid(pid, yeartype):
 
     name, location = metadata.split('–')
     location = location[1:-2]
-    print(location)
+    #print(location)
     plz, place = location.split(' ', 1)
 
     grant["name"] = name[:-1]
