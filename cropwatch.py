@@ -399,8 +399,12 @@ def extract_grants(jahrtype, jahr):
     result_dict = {}
 
     for pid in pid_list:
-        grant = adv_parser_by_pid(pid, jahrtype)
-        result_dict[pid] = grant
+        error, grant = adv_parser_by_pid(pid, jahrtype)
+        if error:
+            with open("error.log", "a") as error_log:
+                error_log.write(str(pid + "\n" ))
+        else:
+            result_dict[pid] = grant
 
     save_grants_to_csv(result_dict, jahr)
     # print(list(map(list, dataframe_2.values)))
@@ -481,7 +485,12 @@ def adv_parser_by_pid(pid, yeartype):
 
     # r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
-    metadata = str(tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0])  # name + ...
+    try:
+        metadata = str(tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0])  # name + ...
+    except IndexError:
+        print("fault pid detected!")
+        print(pid)
+        return True, grant
     raw_measures = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
     raw_amounts = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
@@ -509,7 +518,7 @@ def adv_parser_by_pid(pid, yeartype):
     del raw_amounts
     gc.collect()
 
-    return grant
+    return False, grant
 
 
 def adv_from_plz(plz, jahr):
@@ -553,7 +562,7 @@ def adv_from_plz(plz, jahr):
 
 # extract_by_id("0")
 
-extract_ids("vorjahr", 2015)
+#extract_ids("vorjahr", 2015)
 extract_grants("vorjahr", 2015)
 extract_ids("jahr", 2016)
 extract_grants("jahr", 2016)
