@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import requests
 import pandas
 from time import sleep
@@ -463,7 +466,7 @@ def handle_request(cookie, data):
 
 def adv_parser_ids(response):
     tree = html.document_fromstring(response)
-    pid_list = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')))
+    pid_list = list(map(str, tree.xpath('/html/body/div[5]/div[3]/div/form[2]/table/tbody/tr[*]/th/button/@value')))
     del tree
     gc.collect()
     return pid_list
@@ -491,8 +494,8 @@ def adv_parser_by_pid(pid, yeartype):
         print("fault pid detected!")
         print(pid)
         return True, grant
-    raw_measures = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
-    raw_amounts = list(map(lambda x: str(x), tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
+    raw_measures = list(map(str, tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h3[*]/text()')))  # name of grant
+    raw_amounts = list(map(str, tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/p[*]/span/text()')))  # amount of money
     raw_amounts = raw_amounts[:-2]  # drop unrelevant rows
 
     measure_list = list(map(lambda x: x[2:], raw_measures))
