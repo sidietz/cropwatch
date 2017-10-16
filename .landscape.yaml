@@ -1,0 +1,10 @@
+python-targets:
+    - 3
+max-line-length: 160
+test-warnings: true
+doc-warnings: no
+strictness: veryhigh
+pep8:
+  full:  true
+  disable:
+    - E501
