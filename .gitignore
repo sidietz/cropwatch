@@ -1,2 +1,3 @@
 **/*.xml
 .directory
+.ipynb_checkpoints
