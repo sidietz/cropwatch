@@ -405,7 +405,7 @@ def extract_grants(jahrtype, jahr):
         error, grant = adv_parser_by_pid(pid, jahrtype)
         if error:
             with open("error.log", "a") as error_log:
-                error_log.write(str(pid + "\n" ))
+                error_log.write(str(pid + "\n"))
         else:
             result_dict[pid] = grant
 
