@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import concurrent.futures
-import requests
-import pandas
+import requests as rq
+import pandas as pd
 from time import sleep, time
 import math
 import copy
@@ -25,7 +25,7 @@ with open('plz.csv', newline='') as f:
 
 
 def save_grants_to_csv(grant_dict, jahr):
-    grants_df = pandas.DataFrame.from_dict(grant_dict, orient='index')
+    grants_df = pd.DataFrame.from_dict(grant_dict, orient='index')
     grants_df.reset_index(drop=True, inplace=True)
     grants_df.fillna(value=0, inplace=True)
     grants_df[grants_df.columns[5:]] = grants_df[grants_df.columns[5:]].astype(int)
@@ -34,7 +34,7 @@ def save_grants_to_csv(grant_dict, jahr):
 
 
 def extract_grants(jahrtype, jahr):
-    dataframe = pandas.read_csv(str(str(jahr) + "_ids" + ".csv"))
+    dataframe = pd.read_csv(str(str(jahr) + "_ids" + ".csv"))
     dataframe_2 = dataframe.loc[:, "pid"]
     pid_list = dataframe_2.values.tolist()
     result_dict = {}
@@ -59,7 +59,7 @@ def extract_grants(jahrtype, jahr):
 
 def save_ids_to_csv(array_list, jahr):
     columns = ["pid"]
-    dataframe_3 = pandas.DataFrame(array_list, columns=columns)
+    dataframe_3 = pd.DataFrame(array_list, columns=columns)
     dataframe_3.drop_duplicates(["pid"], inplace=True)
     dataframe_3.reset_index(drop=True, inplace=True)
     dataframe_3.to_csv(str(str(jahr) + "_ids" + ".csv"))
@@ -101,9 +101,9 @@ def handle_request2(cookie, data):
 
     while (not successful):
         try:
-            request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
+            request = rq.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
             successful = True
-        except requests.exceptions.ConnectionError:
+        except rq.exceptions.ConnectionError:
             print("Server to many connections error detected, sleeping!")
             sleep(3)
 
