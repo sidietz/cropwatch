@@ -117,7 +117,7 @@ def amount_to_cent(amount):
     euro = amount[:-3]
     euro = int(euro.replace('.', ''))
     cent = int(amount[-2::])
-    return euro*100 + cent
+    return euro * 100 + cent
 
 
 def adv_parser_by_pid(pid, yeartype):
@@ -183,7 +183,7 @@ def adv_from_plz(plz, jahr):
     request_1 = handle_request(COOKIES, rq_data2)
     name_list = adv_parser_ids(request_1.text)
 
-    while i < math.ceil(view_count/50):
+    while i < math.ceil(view_count / 50):
         rq_data2[22] = ('seite', str(i))
 
         request_1 = handle_request(COOKIES, rq_data2)
