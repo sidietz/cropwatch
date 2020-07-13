@@ -403,15 +403,12 @@ def save_grants_to_csv(grant_dict, jahr):
     grants_df.reset_index(drop=True, inplace=True)
     grants_df.fillna(value=0, inplace=True)
     grants_df[grants_df.columns[5:]] = grants_df[grants_df.columns[5:]].astype(int)
-    # Now you have a csv with columns and index:
     grants_df.to_csv(str(jahr) + "_grants" + ".csv")
     return True
 
 
 def extract_grants(jahrtype, jahr):
-    print("start extraction of data")
     dataframe = pandas.read_csv(str(str(jahr) + "_ids" + ".csv"))
-    # print(dataframe)
     dataframe_2 = dataframe.loc[:, "pid"]
     pid_list = dataframe_2.values.tolist()
     result_dict = {}
@@ -439,7 +436,6 @@ def save_ids_to_csv(array_list, jahr):
     dataframe_3 = pandas.DataFrame(array_list, columns=columns)
     dataframe_3.drop_duplicates(["pid"], inplace=True)
     dataframe_3.reset_index(drop=True, inplace=True)
-    # Now you have a csv with columns and index:
     dataframe_3.to_csv(str(str(jahr) + "_ids" + ".csv"))
     return True
 
@@ -567,7 +563,6 @@ def adv_from_plz(plz, jahr):
     if count == 0:
         return []
 
-    print(plz)
     RQ_DATA_1[0] = ('jahr', jahr)
     RQ_DATA_1[3] = ('plz', str(plz))
     RQ_DATA_1[12] = ('viewCount', view_count)
@@ -592,11 +587,8 @@ def adv_from_plz(plz, jahr):
         name_list.extend(tmp_list)
         i += 1
 
-    #print(name_list)
     return name_list
 
-
-# extract_by_id("0")
 
 s1 = time()
 testyear = 2018
