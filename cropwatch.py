@@ -18,11 +18,6 @@ with open('plz.csv', newline='') as f:
     reader = csv.reader(f)
     PLZS = [i[0] for i in list(reader)]
 
-#print(PLZS)
-
-#PLZS = ["91586"]
-#print(PLZS)
-
 
 def save_grants_to_csv(grant_dict, jahr):
     grants_df = pd.DataFrame.from_dict(grant_dict, orient='index')
@@ -69,7 +64,6 @@ def save_ids_to_csv(array_list, jahr):
 def get_meta_data(response):
     count_start = response.find('<span>')
     raw_count = response[count_start + 22:count_start + 27]
-    # print(raw_count)
     try:
         count = int(raw_count.strip())
     except ValueError:
@@ -77,7 +71,6 @@ def get_meta_data(response):
     view_count_start = response.find('<input id="hCount" name="viewCount" type="hidden" value="', 0)
     view_count_end = response.find('/>', view_count_start)
     raw_v_count = response[view_count_start + 57:view_count_end - 1]
-    # print(raw_v_count)
     view_count = int(raw_v_count)
     return view_count, count
 
@@ -133,7 +126,6 @@ def adv_parser_by_pid(pid, yeartype):
 
     grant = {"pid": pid, "Gesamt": ""}
 
-    # r = handle_request(COOKIES, RQ_DATA_2)
     tree = html.document_fromstring(handle_request(COOKIES, RQ_DATA_2).text)
     try:
         metadata = str(tree.xpath('/html/body/div[5]/div[3]/div/form/div[2]/h2/text()')[0])  # name + ...
@@ -150,7 +142,6 @@ def adv_parser_by_pid(pid, yeartype):
 
     name, location = metadata.split('–')
     location = location[1:-2]
-    #print(location)
     plz, place = location.split(' ', 1)
 
     grant["name"] = name[:-1]
@@ -176,7 +167,6 @@ def adv_from_plz(plz, jahr):
     request_0 = handle_request(COOKIES, RQ_DATA_0)
     text = request_0.text
     view_count, count = get_meta_data(text)
-    # print(view_count, count)
 
     if count == 0:
         return []
