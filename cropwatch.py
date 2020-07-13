@@ -8,7 +8,19 @@ import math
 import copy
 from lxml import html
 import gc
+import csv
 
+
+PLZS = []
+
+with open('plz.csv', newline='') as f:
+    reader = csv.reader(f)
+    PLZS = [i[0] for i in list(reader)]
+
+#print(PLZS)
+
+#PLZS = ["91586"]
+#print(PLZS)
 
 COOKIES_OLD = {
         'JSESSIONID': '37668871C9746D7906C7E66C27AE863D',
