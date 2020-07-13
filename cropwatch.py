@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import math
+import copy
 import concurrent.futures
 import requests as rq
 import pandas as pd
 from time import sleep, time
-import math
-import copy
 from lxml import html
 import csv
 
