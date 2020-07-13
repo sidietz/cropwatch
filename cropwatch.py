@@ -456,14 +456,21 @@ def extract_ids(jahrtype, jahr):
     return 0
 
 
-def handle_request(cookie, data):
-    try:
-        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
-    except requests.exceptions.ConnectionError:
-        print("Server to many connections error detected, sleeping!")
-        sleep(3)
-        request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
+def handle_request2(cookie, data):
+    successful = False
+
+    while (not successful):
+        try:
+            request = requests.post('https://www.agrar-fischerei-zahlungen.de/Suche', headers=H, cookies=cookie, data=data)
+            successful = True
+        except requests.exceptions.ConnectionError:
+            print("Server to many connections error detected, sleeping!")
+            sleep(3)
+
     return request
+
+def handle_request(cookie, data):
+    return handle_request2(cookie, data)
 
 
 def adv_parser_ids(response):
