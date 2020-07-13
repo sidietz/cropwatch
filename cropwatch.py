@@ -546,6 +546,11 @@ def adv_parser_by_pid(pid, yeartype):
 
 
 def adv_from_plz(plz, jahr):
+    try:
+        q = int(plz[1:])
+    except ValueError:
+        return ["FATAL ERROR!"]
+
     RQ_DATA_0[2] = ('plz', str(plz))
     i = 1
     request_0 = handle_request(COOKIES, RQ_DATA_0)
