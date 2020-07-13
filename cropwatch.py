@@ -3,7 +3,7 @@
 
 import requests
 import pandas
-from time import sleep
+from time import sleep, time
 import math
 import copy
 from lxml import html
@@ -581,12 +581,27 @@ def adv_from_plz(plz, jahr):
         name_list.extend(tmp_list)
         i += 1
 
+    #print(name_list)
     return name_list
 
 
 # extract_by_id("0")
 
-#extract_ids("vorjahr", 2015)
-extract_grants("vorjahr", 2015)
-extract_ids("jahr", 2016)
-extract_grants("jahr", 2016)
+s1 = time()
+testyear = 2018
+extract_ids("vorjahr", testyear)
+s2 = time()
+print(f'e ids for {testyear} took {s2 - s1}')
+extract_grants("vorjahr", testyear)
+s3 = time()
+print(f'grants for {testyear} took {s3 - s2}')
+
+testyear = 2019
+extract_ids("jahr", testyear)
+s4 = time()
+print(f'e ids for {testyear} took {s4 - s3}')
+extract_grants("jahr", testyear)
+s5 = time()
+print(f'grants for {testyear} took {s5 - s4}')
+
+print(f'total {s5 - s1}')
