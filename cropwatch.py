@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import concurrent.futures
 import requests
 import pandas
 from time import sleep, time
@@ -415,13 +416,16 @@ def extract_grants(jahrtype, jahr):
     pid_list = dataframe_2.values.tolist()
     result_dict = {}
 
-    for pid in pid_list:
-        error, grant = adv_parser_by_pid(pid, jahrtype)
-        if error:
-            with open("error.log", "a") as error_log:
-                error_log.write(str(pid + "\n"))
-        else:
-            result_dict[pid] = grant
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8*16) as executor:
+        future_to_grantlist = {executor.submit(adv_parser_by_pid, pid, jahrtype): pid for pid in pid_list}
+        for future in concurrent.futures.as_completed(future_to_grantlist):
+            pid = future_to_grantlist[future]
+            error, grant = future.result()
+            if error:
+                with open("error.log", "a") as error_log:
+                    error_log.write(str(pid) + "\n")
+            else:
+                result_dict[pid] = grant
 
     save_grants_to_csv(result_dict, jahr)
     # print(list(map(list, dataframe_2.values)))
@@ -457,13 +461,15 @@ def get_meta_data(response):
 
 
 def extract_ids(jahrtype, jahr):
-    name_list = []
+    name_list = list()
 
-    for i in range(99999, 1, -1):
-        factor = 5-len(str(i))
-        plz = "0"*factor + str(i)
-        tmp_list = adv_from_plz(plz, jahrtype)
-        name_list.extend(tmp_list)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8*16) as executor:
+        future_to_idlist = {executor.submit(adv_from_plz, plz, jahrtype): plz for plz in PLZS}
+        for future in concurrent.futures.as_completed(future_to_idlist):
+            plz = future_to_idlist[future]
+            tmp_list = future.result()
+            name_list.extend(tmp_list)
+
     save_ids_to_csv(name_list, jahr)
     return 0
 
