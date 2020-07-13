@@ -388,6 +388,8 @@ RQ_DATA_3 = [
 def save_grants_to_csv(grant_dict, jahr):
     grants_df = pandas.DataFrame.from_dict(grant_dict, orient='index')
     grants_df.reset_index(drop=True, inplace=True)
+    grants_df.fillna(value=0, inplace=True)
+    grants_df[grants_df.columns[5:]] = grants_df[grants_df.columns[5:]].astype(int)
     # Now you have a csv with columns and index:
     grants_df.to_csv(str(jahr) + "_grants" + ".csv")
     return True
