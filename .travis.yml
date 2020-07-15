@@ -1,2 +1,9 @@
 git:
   depth: 50
+
+language: python
+python:
+  - "3.6"      # current default Python on Travis CI
+  - "3.8"
+install:
+  - pip install -r requirements.txt
