@@ -12,3 +12,5 @@
 .. |coveralls| image:: https://coveralls.io/repos/github/oberam-eng/cropwatch/badge.svg?branch=master
         :alt: Code Coverage
         :target: https://coveralls.io/github/oberam-eng/cropwatch?branch=master
+
+Effective July 3th 2026 cropwatch is sunset.
